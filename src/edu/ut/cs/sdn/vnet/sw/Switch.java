@@ -10,6 +10,10 @@ import edu.ut.cs.sdn.vnet.Iface;
  */
 public class Switch extends Device
 {	
+
+	private SwitchTable routingTable;
+	private static final int TIMEOUT = 15;
+
 	/**
 	 * Creates a router for a specific host.
 	 * @param host hostname for the router
@@ -17,6 +21,7 @@ public class Switch extends Device
 	public Switch(String host, DumpFile logfile)
 	{
 		super(host,logfile);
+		this.routingTable = new SwitchTable(TIMEOUT);
 	}
 
 	/**
@@ -33,5 +38,32 @@ public class Switch extends Device
 		/* TODO: Handle packets                                             */
 		
 		/********************************************************************/
+
+		MACAddress srcMAC = etherPacket.getSourceMAC();
+		MACAddress destMAC = etherPacket.getDestinationMAC();
+
+		updateRouteTable(srcMAC, inIface);
+
+		Iface outIface = this.routingTable.getIFaceForAddr(destMAC);
+		if (outIface != null) {
+			sendPacket(etherPacket, outIface);
+		} else {
+			floodMessage(etherPacket, inIface);
+		}
+		
+
+	}
+
+	private void updateRouteTable(MACAddress address, Iface interface) {
+		this.table.updateEntry(address, interface);
+	}
+
+	private void floodMessage(Ethernet etherPacket, Iface srcIface) {
+		for (String name : this.interfaces.keySet()) {
+			Iface currIface = this.interfaces.get(name);
+			if (!currIface.equals(srcIface)) {
+				sendPacket(etherPacket, currIface);
+			}
+		}
 	}
 }
