@@ -1,6 +1,6 @@
 package edu.ut.cs.sdn.vnet.sw;
 
-import net.floodlightcontroller.packet.Ethernet;
+import net.floodlightcontroller.packet.*;
 import edu.ut.cs.sdn.vnet.Device;
 import edu.ut.cs.sdn.vnet.DumpFile;
 import edu.ut.cs.sdn.vnet.Iface;
@@ -10,11 +10,11 @@ public class TableEntry {
 
     private MACAddress destAddr;
     private Iface outIFace;
-    int timestamp;
+    long timestep;
 
-    public TableEntry(MACAddress addr, Iface interface) {
+    public TableEntry(MACAddress addr, Iface iface) {
         this.destAddr = addr;
-        this.outIFace = interface;
+        this.outIFace = iface;
         this.timestep = System.currentTimeMillis() / 1000;
     }
 

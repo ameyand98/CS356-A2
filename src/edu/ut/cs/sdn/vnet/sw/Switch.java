@@ -1,6 +1,6 @@
 package edu.ut.cs.sdn.vnet.sw;
 
-import net.floodlightcontroller.packet.Ethernet;
+import net.floodlightcontroller.packet.*;
 import edu.ut.cs.sdn.vnet.Device;
 import edu.ut.cs.sdn.vnet.DumpFile;
 import edu.ut.cs.sdn.vnet.Iface;
@@ -54,8 +54,9 @@ public class Switch extends Device
 
 	}
 
-	private void updateRouteTable(MACAddress address, Iface interface) {
-		this.table.updateEntry(address, interface);
+	private void updateRouteTable(MACAddress address, Iface iface) {
+		SwitchTable table = this.routingTable;
+		table.updateEntry(address, iface);
 	}
 
 	private void floodMessage(Ethernet etherPacket, Iface srcIface) {
