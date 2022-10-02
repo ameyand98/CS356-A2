@@ -10,12 +10,12 @@ public class TableEntry {
 
     private MACAddress destAddr;
     private Iface outIFace;
-    long timestep;
+    long timestamp;
 
     public TableEntry(MACAddress addr, Iface iface) {
         this.destAddr = addr;
         this.outIFace = iface;
-        this.timestep = System.currentTimeMillis() / 1000;
+        this.timestamp = System.currentTimeMillis() / 1000;
     }
 
     public MACAddress getEntryMACAddr() {
@@ -26,7 +26,7 @@ public class TableEntry {
         return this.outIFace;
     }
 
-    public int getEntryTimeStamp() {
+    public long getEntryTimeStamp() {
         return this.timestamp;
     }
 
