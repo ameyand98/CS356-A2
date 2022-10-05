@@ -5,6 +5,7 @@ import edu.ut.cs.sdn.vnet.DumpFile;
 import edu.ut.cs.sdn.vnet.Iface;
 
 import net.floodlightcontroller.packet.Ethernet;
+import net.floodlightcontroller.packet.IPv4;
 
 /**
  * @author Aaron Gember-Jacobson and Anubhavnidhi Abhashkumar
@@ -84,7 +85,62 @@ public class Router extends Device
 		
 		/********************************************************************/
 		/* TODO: Handle packets                                             */
-		
+		if(etherPacket.getEtherType() == Ethernet.TYPE_IPv4) {
+
+			IPv4 packet = (IPv4)etherPacket.getPayload();
+
+			//Checksum Verification
+			short prevChecksum = packet.getChecksum();
+			//Checksum -> 0 so seralize recomputes it
+			packet.setChecksum(0);
+			packet.serialize();
+			if (packet.getChecksum() != prevChecksum) {
+				//Invalid checksum -> drop packet
+				return;
+			}
+
+			//TTL Verification
+			packet.setTtl((byte)packet.getTtl() - 1);
+			if(packet.getTtl() == 0) {
+				//Packet cannot travel more hops -> drop packet so not idle in network
+				return;
+			}
+
+			packet.resetChecksum();
+
+			//Check for network interfaces
+			for(String iName: this.interfaces) {
+				Iface interface = this.interfaces.get(iName);
+				//Invariant: interface != null
+				if (packet.getDestinationAddress() == interface.getIpAddress()) {
+					//Dest Addr == Interface IP Addr -> Drop packet
+					return;
+				}
+			}
+
+			//Forward IP Packet (as Ethernet packet)
+			RouteEntry match = routeTable.lookup(packet.getDestinationAddress());
+			if (match == null) {
+				//No entry matched with the destination address -> drop packet
+				return;
+			}
+			
+
+			//Get Next-Hop IP Address (if gatewayAddress = 0 then next-hop is destination address)
+			int nextHopIP = match.getGatewayAddress() == 0 ? packet.getDestinationAddress() : match.getGatewayAddress();
+
+			//MAC address corresponding to next-hop IP from the ARP cache
+			ArpEntry tgt = arpCache.lookup(nextHopIP);
+			// assert(tgt != null);
+			//set destination MAC address to next-hop's MAC address
+			etherPacket.setDestinationMACAddress(tgt.getMac().toBytes());
+
+			//set source MAC address to interface's (outgoing) MAC address
+			etherPacket.setSourceAddress(match.getInterface().getMacAddress().toBytes());
+
+			this.sendPacket(etherPacket, match.getInterface());
+
+		}
 		
 		/********************************************************************/
 	}
