@@ -44,9 +44,9 @@ public class RouteTable
 			for(RouteEntry entry: this.entries) {
 				if((entry.getMaskAddress() & ip) == (entry.getDestinationAddress() & entry.getMaskAddress())) {
 					//match found
-					if (entry.getMaskAddress() >= max) {
+					if (entry.getMaskAddress() >= maxMask) {
 						longestMatch = entry;
-						max = entry.getMaskAddress();
+						maxMask = entry.getMaskAddress();
 					}
 					//Invariants: max > Integer.MIN_VALUE and entry != null
 

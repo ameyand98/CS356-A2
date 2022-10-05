@@ -4,8 +4,7 @@ import edu.ut.cs.sdn.vnet.Device;
 import edu.ut.cs.sdn.vnet.DumpFile;
 import edu.ut.cs.sdn.vnet.Iface;
 
-import net.floodlightcontroller.packet.Ethernet;
-import net.floodlightcontroller.packet.IPv4;
+import net.floodlightcontroller.packet.*;
 
 /**
  * @author Aaron Gember-Jacobson and Anubhavnidhi Abhashkumar
@@ -92,7 +91,7 @@ public class Router extends Device
 			//Checksum Verification
 			short prevChecksum = packet.getChecksum();
 			//Checksum -> 0 so seralize recomputes it
-			packet.setChecksum(0);
+			packet.setChecksum((short)0);
 			packet.serialize();
 			if (packet.getChecksum() != prevChecksum) {
 				//Invalid checksum -> drop packet
@@ -100,7 +99,7 @@ public class Router extends Device
 			}
 
 			//TTL Verification
-			packet.setTtl((byte)packet.getTtl() - 1);
+			packet.setTtl((byte)(packet.getTtl() - 1));
 			if(packet.getTtl() == 0) {
 				//Packet cannot travel more hops -> drop packet so not idle in network
 				return;
@@ -109,10 +108,9 @@ public class Router extends Device
 			packet.resetChecksum();
 
 			//Check for network interfaces
-			for(String iName: this.interfaces) {
-				Iface interface = this.interfaces.get(iName);
+			for(Iface iface: this.interfaces.values()) {
 				//Invariant: interface != null
-				if (packet.getDestinationAddress() == interface.getIpAddress()) {
+				if (packet.getDestinationAddress() == iface.getIpAddress()) {
 					//Dest Addr == Interface IP Addr -> Drop packet
 					return;
 				}
@@ -136,7 +134,7 @@ public class Router extends Device
 			etherPacket.setDestinationMACAddress(tgt.getMac().toBytes());
 
 			//set source MAC address to interface's (outgoing) MAC address
-			etherPacket.setSourceAddress(match.getInterface().getMacAddress().toBytes());
+			etherPacket.setSourceMACAddress(match.getInterface().getMacAddress().toBytes());
 
 			this.sendPacket(etherPacket, match.getInterface());
 
