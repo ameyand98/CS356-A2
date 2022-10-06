@@ -34,16 +34,14 @@ public class Switch extends Device
 		System.out.println("*** -> Received packet: " +
                 etherPacket.toString().replace("\n", "\n\t"));
 		
-		/********************************************************************/
-		/* TODO: Handle packets                                             */
-		
-		/********************************************************************/
-
+		// get src and dest mac addr of the paket
 		MACAddress srcMAC = etherPacket.getSourceMAC();
 		MACAddress destMAC = etherPacket.getDestinationMAC();
 
+		// switch learning part - add the src addr interface to our table if it doesn't already exist
 		updateRouteTable(srcMAC, inIface);
 
+		// get the interface to send this packet out of. if no interface, flood the packet  
 		Iface outIface = this.routingTable.getIFaceForAddr(destMAC);
 		if (outIface != null) {
 			sendPacket(etherPacket, outIface);
@@ -54,11 +52,13 @@ public class Switch extends Device
 
 	}
 
+	// adds switch table entry for the src address if it doesn't already exist
 	private void updateRouteTable(MACAddress address, Iface iface) {
 		SwitchTable table = this.routingTable;
 		table.updateEntry(address, iface);
 	}
 
+	// floods the packet on all interfaces 
 	private void floodMessage(Ethernet etherPacket, Iface srcIface) {
 		for (String name : this.interfaces.keySet()) {
 			Iface currIface = this.interfaces.get(name);

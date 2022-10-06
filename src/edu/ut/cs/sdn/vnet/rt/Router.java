@@ -106,6 +106,7 @@ public class Router extends Device
 			}
 
 			packet.resetChecksum();
+			packet.seralize();
 
 			//Check for network interfaces
 			for(Iface iface: this.interfaces.values()) {
@@ -129,6 +130,10 @@ public class Router extends Device
 
 			//MAC address corresponding to next-hop IP from the ARP cache
 			ArpEntry tgt = arpCache.lookup(nextHopIP);
+			if (tgt == null) {
+				// host doesn't exist in network, so drop the packet 
+				return;
+			}
 			// assert(tgt != null);
 			//set destination MAC address to next-hop's MAC address
 			etherPacket.setDestinationMACAddress(tgt.getMac().toBytes());
