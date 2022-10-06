@@ -123,8 +123,12 @@ public class Router extends Device
 				//No entry matched with the destination address -> drop packet
 				return;
 			}
-			
 
+			if (match.getInterface().getName().equals(inIface.getName())) {
+				//forwarding packet to interface packet came from -> duplicate so drop packet
+				return;
+			}
+			
 			//Get Next-Hop IP Address (if gatewayAddress = 0 then next-hop is destination address)
 			int nextHopIP = match.getGatewayAddress() == 0 ? packet.getDestinationAddress() : match.getGatewayAddress();
 
