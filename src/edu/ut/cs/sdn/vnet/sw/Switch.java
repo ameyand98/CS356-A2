@@ -62,6 +62,7 @@ public class Switch extends Device
 	private void floodMessage(Ethernet etherPacket, Iface srcIface) {
 		for (String name : this.interfaces.keySet()) {
 			Iface currIface = this.interfaces.get(name);
+			// make sure the curr iface is not the iface the packet arrived through 
 			if (!currIface.equals(srcIface)) {
 				sendPacket(etherPacket, currIface);
 			}

@@ -105,6 +105,7 @@ public class Router extends Device
 				return;
 			}
 
+			// recompute checksum 
 			packet.resetChecksum();
 			packet.serialize();
 

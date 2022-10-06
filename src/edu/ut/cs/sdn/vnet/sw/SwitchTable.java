@@ -28,6 +28,7 @@ public class SwitchTable {
     // updates an entry in the table 
     public void updateEntry(MACAddress address, Iface iface) {
         if (this.routeTable.containsKey(address)) {
+            // if the entry already exists, only need to update the timestamp and nothing else 
             Iface currIface = this.routeTable.get(address).getEntryIFace();
             if (currIface.getName().equals(iface.getName())) {
                 this.routeTable.get(address).restEntryTimeStamp();
@@ -35,7 +36,7 @@ public class SwitchTable {
             }
             
         }
-        // this handles new address and interfaces
+        // handles creating a new entry and updating the interface for a current entry
         this.addEntry(address, new TableEntry(address, iface));
     }
 
@@ -44,8 +45,10 @@ public class SwitchTable {
         if (this.routeTable.containsKey(address)) {
             boolean isTimedOut = (this.routeTable.get(address).getEntryTimeStamp() - System.currentTimeMillis() / 1000) > 15;
             if (!isTimedOut) {
+                // valid entry
                 return this.routeTable.get(address).getEntryIFace();
             } else {
+                // entry timed out, so remove it 
                 this.routeTable.remove(address);
             }
         } 

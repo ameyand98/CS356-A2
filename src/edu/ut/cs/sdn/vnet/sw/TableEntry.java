@@ -18,18 +18,22 @@ public class TableEntry {
         this.timestamp = System.currentTimeMillis() / 1000;
     }
 
+    // return the mac address of the table entry 
     public MACAddress getEntryMACAddr() {
         return this.destAddr;
     }
 
+    // return the Interface of the table entry 
     public Iface getEntryIFace() {
         return this.outIFace;
     }
 
+    //  get the current timestamp of the given entry 
     public long getEntryTimeStamp() {
         return this.timestamp;
     }
 
+    // reset the timestamp of the given entry 
     public void restEntryTimeStamp() {
         this.timestamp = System.currentTimeMillis() / 1000;
     }
