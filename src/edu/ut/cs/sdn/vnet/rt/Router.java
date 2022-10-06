@@ -106,7 +106,7 @@ public class Router extends Device
 			}
 
 			packet.resetChecksum();
-			packet.seralize();
+			packet.serialize();
 
 			//Check for network interfaces
 			for(Iface iface: this.interfaces.values()) {

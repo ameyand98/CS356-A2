@@ -27,11 +27,10 @@ public class SwitchTable {
 
     // updates an entry in the table 
     public void updateEntry(MACAddress address, Iface iface) {
-        SwitchTable table = this.routeTable; 
-        if (table.containsKey(address)) {
-            Iface currIface = table.get(address).getEntryIFace();
+        if (this.routeTable.containsKey(address)) {
+            Iface currIface = this.routeTable.get(address).getEntryIFace();
             if (currIface.getName().equals(iface.getName())) {
-                TableEntry entry = table.get(address).restEntryTimeStamp();
+                this.routeTable.get(address).restEntryTimeStamp();
                 return;
             }
             
@@ -43,12 +42,11 @@ public class SwitchTable {
     // returns the interface to send a packet out on for a given destination address. if no entry exists, returns null 
     public Iface getIFaceForAddr(MACAddress address) {
         if (this.routeTable.containsKey(address)) {
-            SwitchTable table = this.routeTable;
-            boolean isTimedOut = (table.get(address).getEntryTimeStamp() - System.currentTimeMillis() / 1000) > 15;
+            boolean isTimedOut = (this.routeTable.get(address).getEntryTimeStamp() - System.currentTimeMillis() / 1000) > 15;
             if (!isTimedOut) {
-                return table.get(address).getEntryIFace();
+                return this.routeTable.get(address).getEntryIFace();
             } else {
-                table.remove(address);
+                this.routeTable.remove(address);
             }
         } 
         return null;
